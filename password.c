@@ -1,4 +1,4 @@
-//未完成まだ採点しないでください
+//完成版2025/12/13 上野能登制作
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -7,11 +7,22 @@ typedef struct passchar{
     char pass;
     struct passchar *next;
 } passchar;
-
 passchar *head = NULL;
+
+void mfree(){
+    passchar *current = head;
+    passchar *temp;
+    while (current != NULL) {
+        temp = current;       
+        current = current->next; 
+        free(temp);           
+    }
+}
+
 void add_pass_to_front(char pass){
     passchar *new_char = (passchar *)malloc(sizeof(passchar));
     if(new_char == NULL){
+        mfree();
         printf("メモリ確保エラー");
         exit(EXIT_FAILURE);
     }
@@ -27,6 +38,7 @@ char list_print(int n){
     while(i<n){
         if(next->next == NULL){
             printf("メモリ参照エラー");
+            mfree();
             exit(EXIT_FAILURE);
         }
         next = next->next;
@@ -47,23 +59,27 @@ char  judgecomplex(int n,char start,char end){
     return(0);
 }
 
+
+
 int main(){
     int flag[3];
     char word;
     int counter=0;
     int i=0;
-    printf("enter your pass word. (plz enter ctrl + Z as EOF)");
+    printf("Enter your password. It must be 8 characters or more in length. Also You must include uppercase letters, lowercase letters, and digits.\nEnter your password:");
     while(scanf("%c", &word) != EOF){
+        if(word == '\n' || word == '\r') break; // 改行はスキップ
         add_pass_to_front(word);
         counter++ ;
     }
-    if(counter <= 8){
-        printf("Your password is too short to use. So, you shold consider long pass.");
-        exit(EXIT_SUCCESS);
+    if(counter < 8){
+        printf("Your password is too short to use. So, you should consider long pass.");
     }
-    if(judgecomplex(counter,49,57)&&judgecomplex(counter,65,90)&&judgecomplex(counter,97,122)){
+    else if(judgecomplex(counter,'0','9')&&judgecomplex(counter,'A','Z')&&judgecomplex(counter,'a','z')){
         printf("Your password is Strong.");
-        exit(EXIT_SUCCESS);
     }
-
+    else{
+        printf("Your password is too easy to use. You should include uppercase letters, lowercase letters, and digits.");
+    }
+    mfree();
 }
